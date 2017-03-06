@@ -57,8 +57,10 @@ Items:
 	  Group:Switch:MAX Person_2 "Person 2 [%d]" <woman> (Presence)
 	  	Switch Person_2_Wifi "Person 2 Wifi [%s]" (Person_2)
 
-	DateTime Person_1_Wifi_LastSeen "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }
-	DateTime Person_2_Wifi_LastSeen "Person 2 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }
+	DateTime Person_1_Wifi_LastSeen         "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }
+	Number   Person_1_Wifi_LastSeen_Seconds "Person 1 Wifi last seen [%d]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/seconds:state:default]" }
+	DateTime Person_2_Wifi_LastSeen         "Person 2 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }
+	Number   Person_1_Wifi_LastSeen_Seconds "Person 2 Wifi last seen [%d]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/seconds:state:default]" }
 
 Rule:
 
@@ -66,9 +68,9 @@ Rule:
 	when
 		Time cron "30 * * * * ?"
 	then
-		val now_ms = now.millis
-		val Person_1_Wifi_LastSeen_Millis = (Person_1_Wifi_LastSeen.state as DateTimeType).calendar.timeInMillis
-		val Person_2_Wifi_LastSeen_Millis = (Person_2_Wifi_LastSeen.state as DateTimeType).calendar.timeInMillis
+		var Number now_ms = now.millis
+		var Number Person_1_Wifi_LastSeen_Millis = (Person_1_Wifi_LastSeen_Seconds.state as Number) * 1000
+		var Number Person_2_Wifi_LastSeen_Millis = (Person_2_Wifi_LastSeen_Seconds.state as Number) * 1000
 
 		logInfo("Wifi Detection", "Millis since last seen P1: "+(now_ms - Person_1_Wifi_LastSeen_Millis))
 		logInfo("Wifi Detection", "Millis since last seen P2: "+(now_ms - Person_2_Wifi_LastSeen_Millis))

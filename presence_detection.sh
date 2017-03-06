@@ -13,5 +13,6 @@ do
   for mac in $maclist
   do
     mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}" -m $(date +%Y-%m-%dT%H:%M:%S.000%z)
+    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}/seconds" -m $(date +%s)
   done
 done

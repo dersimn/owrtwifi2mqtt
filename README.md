@@ -3,7 +3,12 @@ Installation
 
 ### Install the MQTT client
 
-Install the package `mosquitto-client` with either luci or opkg.
+Install the packages
+
+- `mosquitto-client`
+- `coreutils-nohup`
+
+with either luci or opkg.
 
 ### Create user (optional)
 
@@ -60,7 +65,15 @@ Items:
 	DateTime Person_1_Wifi_LastSeen         "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }
 	Number   Person_1_Wifi_LastSeen_Seconds "Person 1 Wifi last seen [%d]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/seconds:state:default]" }
 	DateTime Person_2_Wifi_LastSeen         "Person 2 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }
-	Number   Person_1_Wifi_LastSeen_Seconds "Person 2 Wifi last seen [%d]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/seconds:state:default]" }
+	Number   Person_2_Wifi_LastSeen_Seconds "Person 2 Wifi last seen [%d]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/seconds:state:default]" }
+
+	Switch   Person_1_Wifi_Event            "Person 1 Wifi Event [%s]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/event:state:MAP(presence_event.map)]" }
+	Switch   Person_2_Wifi_Event            "Person 2 Wifi Event [%s]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/event:state:MAP(presence_event.map)]" }
+
+Map file `presence_event.map`:
+
+	new=ON
+	del=OFF
 
 Rule:
 
@@ -92,7 +105,34 @@ Rule:
 		}
 	end
 
+	rule "Wifi Event Person_1"
+		when
+			Item Person_1_Wifi_Event received update
+		then
+			if ( Person_1_Wifi_Event.state == ON ) {
+				logInfo("Wifi Detection", "Person_1 came home (Wifi Event)")
+				Person_1_Wifi.setState(ON)
+			}
+			if ( Person_1_Wifi_Event.state == OFF ) {
+				logInfo("Wifi Detection", "Person_1 left (Wifi Event)")
+				Person_1_Wifi.setState(OFF)
+			}
+	end
+	rule "Wifi Event Person_2"
+		when
+			Item Person_2_Wifi_Event received update
+		then
+			if ( Person_2_Wifi_Event.state == ON ) {
+				logInfo("Wifi Detection", "Person_2 came home (Wifi Event)")
+				Person_2_Wifi.setState(ON)
+			}
+			if ( Person_2_Wifi_Event.state == OFF ) {
+				logInfo("Wifi Detection", "Person_2 left (Wifi Event)")
+				Person_2_Wifi.setState(OFF)
+			}
+	end
+
 Credits
 -------
 
-Original idea and script from [Jupiter "belikh" Belic](http://community.openhab.org/users/belikh).
+Original idea and script from [Jupiter "belikh" Belic](http://community.openhab.org/users/belikh). Suggestion to use `iw event` from [Tom "tomdee" Denham](https://github.com/tomdee).

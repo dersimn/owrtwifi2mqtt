@@ -1,29 +1,51 @@
 rule "Wifi Detection"
-when
-	Time cron "30 * * * * ?"
-then
-	var Number now_ms = now.millis
-	var Number Person_1_Wifi_LastSeen_Millis = (Person_1_Wifi_LastSeen_Seconds.state as Number) * 1000
-	var Number Person_2_Wifi_LastSeen_Millis = (Person_2_Wifi_LastSeen_Seconds.state as Number) * 1000
+	when
+		Time cron "30 * * * * ?"
+	then
+		var Number now_ms = now.millis
+		var Number Person_1_Wifi_LastSeen_Millis = (Person_1_Wifi_LastSeen_Seconds.state as Number) * 1000
+		var Number Person_2_Wifi_LastSeen_Millis = (Person_2_Wifi_LastSeen_Seconds.state as Number) * 1000
 
-	logInfo("Wifi Detection", "Millis since last seen P1: "+(now_ms - Person_1_Wifi_LastSeen_Millis))
-	logInfo("Wifi Detection", "Millis since last seen P2: "+(now_ms - Person_2_Wifi_LastSeen_Millis))
+		logInfo("Wifi Detection", "Millis since last seen P1: "+(now_ms - Person_1_Wifi_LastSeen_Millis))
+		logInfo("Wifi Detection", "Millis since last seen P2: "+(now_ms - Person_2_Wifi_LastSeen_Millis))
 
-	// Set timeout for each Person. For e.g. 4min here.
-	if ( (now_ms - Person_1_Wifi_LastSeen_Millis) < 4*60*1000 ) {
-		logInfo("Wifi Detection", "Person_1 still here")
-		Person_1_Wifi.setState(ON)
-	} else {
-		logInfo("Wifi Detection", "Person_1 not here")
-		Person_1_Wifi.setState(OFF)
-	}
-	if ( (now_ms - Person_2_Wifi_LastSeen_Millis) < 4*60*1000 ) {
-		logInfo("Wifi Detection", "Person_2 still here")
-		Person_2_Wifi.setState(ON)
-	} else {
-		logInfo("Wifi Detection", "Person_2 not here")
-		Person_2_Wifi.setState(OFF)
-	}
+		if ( (now_ms - Person_1_Wifi_LastSeen_Millis) > 4*60*1000 ) {
+			logInfo("Wifi Detection", "Person_1 not here")
+			Person_1_Wifi.setState(OFF)
+		}
+
+		if ( (now_ms - Person_2_Wifi_LastSeen_Millis) > 4*60*1000 ) {
+			logInfo("Wifi Detection", "Person_2 not here")
+			Person_2_Wifi.setState(OFF)
+		}
+end
+rule "Wifi Detection Person_1"
+	when
+		Item Person_1_Wifi_LastSeen_Seconds received update
+	then
+		var Number now_ms = now.millis
+		var Number Person_1_Wifi_LastSeen_Millis = (Person_1_Wifi_LastSeen_Seconds.state as Number) * 1000
+
+		logInfo("Wifi Detection", "Millis since last seen P1: "+(now_ms - Person_1_Wifi_LastSeen_Millis))
+
+		if ( (now_ms - Person_1_Wifi_LastSeen_Millis) < 4*60*1000 ) {
+			logInfo("Wifi Detection", "Person_1 still here")
+			Person_1_Wifi.setState(ON)
+		}
+end
+rule "Wifi Detection Person_2"
+	when
+		Item Person_2_Wifi_LastSeen_Seconds received update
+	then
+		var Number now_ms = now.millis
+		var Number Person_2_Wifi_LastSeen_Millis = (Person_2_Wifi_LastSeen_Seconds.state as Number) * 1000
+
+		logInfo("Wifi Detection", "Millis since last seen P2: "+(now_ms - Person_2_Wifi_LastSeen_Millis))
+
+		if ( (now_ms - Person_2_Wifi_LastSeen_Millis) < 4*60*1000 ) {
+			logInfo("Wifi Detection", "Person_2 still here")
+			Person_2_Wifi.setState(ON)
+		}
 end
 
 rule "Wifi Event Person_1"

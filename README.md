@@ -10,24 +10,6 @@ Install the packages
 
 with either luci or opkg.
 
-### Create user (optional)
-
-It's recommended that you create a new user on your OpenWRT Router for this. Better don't use root for this script (just in case).
-
-Unfortunatedly there isn't something like `adduser` available, so edit the configuration files manually. I recommend doing this via SCP or using nano on the command line:
-
-In `/etc/passwd`:
-
-	presencedetector:*:1001:1001:presencedetector:/:/bin/false
-
-In `/etc/group`:
-
-	presencedetector:x:1001:
-
-In `/etc/shadow`:
-
-	presencedetector:x:0:0:99999:7:::
-
 ### Copy over the scripts
 
 Again, use SCP for that or Copy&Paste the contents via command line. I'd recommend to place them under
@@ -39,7 +21,7 @@ Again, use SCP for that or Copy&Paste the contents via command line. I'd recomme
 
 Create initial contab:
 
-	crontab -e -u presencedetector
+	crontab -e
 
 Add a line for the script:
 

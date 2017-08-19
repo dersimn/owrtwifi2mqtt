@@ -58,7 +58,10 @@ rule "Wifi Event Person_1"
 		}
 		if ( Person_1_Wifi_Event.state == OFF ) {
 			logInfo("Wifi Detection", "Person_1 left (Wifi Event)")
-			Person_1_Wifi.setState(OFF)
+			
+			// I found it better to disable this option,
+			// because some smartphones do WiFi disconnects for <10 seconds at night
+			//Person_1_Wifi.setState(OFF)
 		}
 end
 rule "Wifi Event Person_2"
@@ -71,6 +74,9 @@ rule "Wifi Event Person_2"
 		}
 		if ( Person_2_Wifi_Event.state == OFF ) {
 			logInfo("Wifi Detection", "Person_2 left (Wifi Event)")
-			Person_2_Wifi.setState(OFF)
+			
+			// I found it better to disable this option,
+			// because some smartphones do WiFi disconnects for <10 seconds at night
+			//Person_2_Wifi.setState(OFF)
 		}
 end

@@ -1,0 +1,2 @@
+Switch AmazonDashButton_1 { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/event:state:MAP(presence_event.map)]" }
+Switch AmazonDashButton_2 { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00/event:state:MAP(presence_event.map)]" }

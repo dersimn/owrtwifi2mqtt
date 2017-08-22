@@ -1,8 +1,8 @@
-Group:Switch:SUM Presence "Peolpe at home: [%d]" <presence>
-  Group:Switch:MAX Person_1 "Person 1 [%d]" <man> (Presence)
+Group:Switch:OR(ON, OFF) Presence "Peolpe at home: [%d]" <presence>
+  Group:Switch:OR(ON, OFF) Person_1 "Person 1 [%d]" <man> (Presence)
     Switch Person_1_Geofency "Person 1 Geofency [%s]" (Person_1)
     Switch Person_1_Wifi "Person 1 Wifi [%s]" (Person_1)
-  Group:Switch:MAX Person_2 "Person 2 [%d]" <woman> (Presence)
+  Group:Switch:OR(ON, OFF) Person_2 "Person 2 [%d]" <woman> (Presence)
   	Switch Person_2_Wifi "Person 2 Wifi [%s]" (Person_2)
 
 DateTime Person_1_Wifi_LastSeen         "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:/presence/wifi/00-00-00-00-00-00:state:default]" }

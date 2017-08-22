@@ -12,7 +12,8 @@ with either luci or opkg.
 
 ### Copy over the scripts
 
-Again, use SCP for that or Copy&Paste the contents via command line. I'd recommend to place them under
+Use SCP for that or Copy & Paste the contents via command line. When trying to use SCP with Cyberduck/Transmit on macOS, see this [article](https://wiki.openwrt.org/doc/howto/sftp.server).  
+I'd recommend to place them in:
 
 - `/usr/bin/presence_detection.sh`
 - `/usr/bin/presence_event.sh`

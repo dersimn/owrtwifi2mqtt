@@ -11,12 +11,12 @@ rule "Wifi Detection"
 
 		if ( (now_ms - Person_1_Wifi_LastSeen_Millis) > 4*60*1000 ) {
 			logInfo("Wifi Detection", "Person_1 not here")
-			Person_1_Wifi.setState(OFF)
+			Person_1_Wifi_LastSeen_State.setState(OFF)
 		}
 
 		if ( (now_ms - Person_2_Wifi_LastSeen_Millis) > 4*60*1000 ) {
 			logInfo("Wifi Detection", "Person_2 not here")
-			Person_2_Wifi.setState(OFF)
+			Person_2_Wifi_LastSeen_State.setState(OFF)
 		}
 end
 rule "Wifi Detection Person_1"
@@ -30,7 +30,7 @@ rule "Wifi Detection Person_1"
 
 		if ( (now_ms - Person_1_Wifi_LastSeen_Millis) < 4*60*1000 ) {
 			logInfo("Wifi Detection", "Person_1 still here")
-			Person_1_Wifi.setState(ON)
+			Person_1_Wifi_LastSeen_State.setState(ON)
 		}
 end
 rule "Wifi Detection Person_2"
@@ -44,8 +44,34 @@ rule "Wifi Detection Person_2"
 
 		if ( (now_ms - Person_2_Wifi_LastSeen_Millis) < 4*60*1000 ) {
 			logInfo("Wifi Detection", "Person_2 still here")
-			Person_2_Wifi.setState(ON)
+			Person_2_Wifi_LastSeen_State.setState(ON)
 		}
+end
+
+rule "Wifi LastSeen State Person_1"
+	when
+		Item Person_1_Wifi_LastSeen_State changed to OFF
+	then
+		Person_1_Wifi.setState(OFF)
+end
+rule "Wifi LastSeen State Person_1"
+	when
+		Item Person_1_Wifi_LastSeen_State received update ON
+	then
+		Person_1_Wifi.setState(ON)
+end
+
+rule "Wifi LastSeen State Person_2"
+	when
+		Item Person_2_Wifi_LastSeen_State changed to OFF
+	then
+		Person_2_Wifi.setState(OFF)
+end
+rule "Wifi LastSeen State Person_2"
+	when
+		Item Person_2_Wifi_LastSeen_State received update ON
+	then
+		Person_2_Wifi.setState(ON)
 end
 
 rule "Wifi Event Person_1"

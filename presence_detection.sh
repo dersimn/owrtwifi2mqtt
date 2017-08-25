@@ -1,8 +1,8 @@
 #!/bin/sh
 
 MQTT_SERVER="10.1.1.50"
-MQTT_ID="Router"
-MQTT_TOPIC="/presence/wifi/"
+MQTT_ID="OpenWRT-Presence-LastSeen"
+MQTT_TOPIC="owrtwifi/status/mac-"
 
 for interface in `iw dev | grep Interface | cut -f 2 -s -d" "`
 do
@@ -12,7 +12,7 @@ do
   # for each mac address in that list...
   for mac in $maclist
   do
-    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}" -m $(date +%Y-%m-%dT%H:%M:%S.000%z)
-    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}/seconds" -m $(date +%s)
+    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}/lastseen" -m $(date +%Y-%m-%dT%H:%M:%S.000%z)
+    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}/lastseen/epoch" -m $(date +%s)
   done
 done

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 MQTT_SERVER="10.1.1.50"
-MQTT_ID="Router"
-MQTT_TOPIC="/presence/wifi/"
+MQTT_ID="OpenWRT-Presence-Event"
+MQTT_TOPIC="owrtwifi/status/mac-"
 
 iw event | \
 while read LINE; do

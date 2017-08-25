@@ -15,7 +15,7 @@ with either luci or opkg.
 Use SCP for that or Copy & Paste the contents via command line. When trying to use SCP with Cyberduck/Transmit on macOS, see this [article](https://wiki.openwrt.org/doc/howto/sftp.server).  
 I'd recommend to place them in:
 
-- `/usr/bin/presence_detection.sh`
+- `/usr/bin/presence_lastseen.sh`
 - `/usr/bin/presence_event.sh`
 
 ### Create Cron job
@@ -26,7 +26,7 @@ Create initial contab:
 
 Add a line for the script:
 
-	*/1 * * * * /usr/bin/presence_detection.sh
+	*/1 * * * * /usr/bin/presence_lastseen.sh
 
 Enable Cron:
 

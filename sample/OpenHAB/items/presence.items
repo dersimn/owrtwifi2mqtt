@@ -9,11 +9,11 @@ Group:Switch:OR(ON, OFF) Presence "Peolpe at home: [%d]" <presence>
 // If you want to restore the state use `Person_X_Wifi_LastSeen_Seconds`
 
 Switch   Person_1_Wifi_LastSeen_State
-DateTime Person_1_Wifi_LastSeen         "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/lastseen:state:default]" }
+DateTime Person_1_Wifi_LastSeen         "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/lastseen/iso8601:state:default]" }
 Number   Person_1_Wifi_LastSeen_Seconds "Person 1 Wifi last seen [%d]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/lastseen/epoch:state:default]" }
 
 Switch   Person_2_Wifi_LastSeen_State
-DateTime Person_2_Wifi_LastSeen         "Person 2 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/lastseen:state:default]" }
+DateTime Person_2_Wifi_LastSeen         "Person 2 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/lastseen/iso8601:state:default]" }
 Number   Person_2_Wifi_LastSeen_Seconds "Person 2 Wifi last seen [%d]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/lastseen/epoch:state:default]" }
 
 Switch   Person_1_Wifi_Event            "Person 1 Wifi Event [%s]" { mqtt="<[mosquitto:owrtwifi/status/mac-00-00-00-00-00-00/event:state:MAP(presence_event.map)]" }

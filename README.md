@@ -48,7 +48,7 @@ After installation the following topics will be published for each WiFi device, 
 
 	owrtwifi/status/mac-00-00-00-00-00-00/lastseen/iso8601
 
-Payload contains the timestamp when the device was seen in an OpenHAB-compatible `DateTime` format, like this: `2017-08-25T19:29:57.000+0200`
+Payload contains the timestamp when the device was seen in an ISO 8601 (and OpenHAB) compatible format, like this: `2017-08-25T19:29:57+0200`
 
 	owrtwifi/status/mac-00-00-00-00-00-00/lastseen/epoch
 

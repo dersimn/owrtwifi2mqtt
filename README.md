@@ -46,7 +46,7 @@ Usage
 
 After installation the following topics will be published for each WiFi device, using the _lowercase_ MAC address:
 
-	owrtwifi/status/mac-00-00-00-00-00-00/lastseen
+	owrtwifi/status/mac-00-00-00-00-00-00/lastseen/iso8601
 
 Payload contains the timestamp when the device was seen in an OpenHAB-compatible `DateTime` format, like this: `2017-08-25T19:29:57.000+0200`
 

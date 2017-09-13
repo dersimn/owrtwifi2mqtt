@@ -26,7 +26,7 @@ Create initial contab:
 
 Add a line for the script:
 
-	*/1 * * * * /usr/bin/presence_lastseen.sh
+	*/1 * * * * sh /usr/bin/presence_lastseen.sh
 
 Enable Cron:
 
@@ -37,7 +37,7 @@ Enable Cron:
 
 Place the following line
 
-	nohup /usr/bin/presence_event.sh >/dev/null 2>&1 &
+	nohup sh /usr/bin/presence_event.sh >/dev/null 2>&1 &
 
 inside the `/etc/rc.local` file before the `exit 0`. You can to this via command-line or via LuCI in System -> Startup -> Local Startup. The script will be executed after reboot.
 

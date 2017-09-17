@@ -12,7 +12,7 @@ do
   # for each mac address in that list...
   for mac in $maclist
   do
-    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}/lastseen/iso8601" -m $(date +%Y-%m-%dT%H:%M:%S%z)
-    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${mac//:/-}/lastseen/epoch" -m $(date +%s)
+    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "$MQTT_TOPIC${mac//:/-}/lastseen/iso8601" -m $(date +%Y-%m-%dT%H:%M:%S%z)
+    mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "$MQTT_TOPIC${mac//:/-}/lastseen/epoch" -m $(date +%s)
   done
 done

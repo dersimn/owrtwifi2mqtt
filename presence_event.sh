@@ -11,6 +11,6 @@ while read LINE; do
         MAC=`echo $LINE | awk '/(new|del) station/ {print $4}'`
 
         #echo "Mac: $MAC did $EVENT"
-        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "${MQTT_TOPIC}${MAC//:/-}/event" -m $EVENT  
+        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID -t "$MQTT_TOPIC${MAC//:/-}/event" -m $EVENT  
     fi
 done

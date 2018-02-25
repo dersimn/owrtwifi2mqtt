@@ -10,34 +10,17 @@ Install the packages
 
 with either luci or opkg.
 
-### Copy over the scripts
+### Copy over the script
 
-Use SCP for that or Copy & Paste the contents via command line. When trying to use SCP with Cyberduck/Transmit on macOS, see this [article](https://wiki.openwrt.org/doc/howto/sftp.server).  
-I'd recommend to place them in:
+Use SCP to copy the presence_report script to `/usr/bin/presence_report` on the target device.
+Call `chmod u+x /usr/bin/presence_report` to allow script execution.
 
-- `/usr/bin/presence_lastseen.sh`
-- `/usr/bin/presence_event.sh`
+### Add the script to rc.local
 
-### Create Cron job
+Place the following lines
 
-Create initial contab:
-
-	crontab -e
-
-Add a line for the script:
-
-	*/1 * * * * sh /usr/bin/presence_lastseen.sh
-
-Enable Cron:
-
-	/etc/init.d/cron start
-	/etc/init.d/cron enable
-
-### Add event-based script to rc.local
-
-Place the following line
-
-	nohup sh /usr/bin/presence_event.sh >/dev/null 2>&1 &
+- `nohup sh /usr/bin/presence_report event 192.168.1.2 >/dev/null 2>&1 &`
+- `nohup sh /usr/bin/presence_report lastseen 192.168.1.2 >/dev/null 2>&1 &`
 
 inside the `/etc/rc.local` file before the `exit 0`. You can to this via command-line or via LuCI in System -> Startup -> Local Startup. The script will be executed after reboot.
 

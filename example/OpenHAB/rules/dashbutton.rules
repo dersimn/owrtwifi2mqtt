@@ -1,7 +1,0 @@
-rule "Amazon Dash Button 1"
-    when
-        Item AmazonDashButton_1 changed to ON
-    then
-        logInfo("Dash Rules", "Dash Button 1 has been pressed")
-        //pushover("Dash Button 1 has been pressed")
-end

@@ -1,0 +1,24 @@
+Group:Switch:OR(ON, OFF) Presence "Peolpe at home: [%d]" <presence>
+  Group:Switch:OR(ON, OFF) Person_1 "Person 1 [%d]" <man> (Presence)
+    Switch Person_1_Geofency "Person 1 Geofency [%s]" (Person_1)
+    Switch Person_1_Wifi "Person 1 Wifi [%s]" (Person_1)
+  Group:Switch:OR(ON, OFF) Person_2 "Person 2 [%d]" <woman> (Presence)
+  	Switch Person_2_Wifi "Person 2 Wifi [%s]" (Person_2)
+
+// DO NOT restore state from database for `Person_X_Wifi_LastSeen_State`
+// If you want to restore the state use `Person_X_Wifi_LastSeen_Seconds`
+
+// The example below works with the openHAB MQTT 2.4 binding
+// Creation of corresponding THINGS can be done via Paper UI or configuration files, see example `presence_mqtt_2.4.things`
+// Below "mosquitto" should be replaced by the MQTT brokers name
+
+Switch   Person_1_Wifi_LastSeen_State
+DateTime Person_1_Wifi_LastSeen         "Person 1 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { channel="mqtt:topic:mosquitto:Person_1_Wifi_LastSeen" }
+Number   Person_1_Wifi_LastSeen_Seconds "Person 1 Wifi last seen [%d]" { channel="mqtt:topic:mosquitto:Person_1_Wifi_LastSeen_Seconds" }
+
+Switch   Person_2_Wifi_LastSeen_State
+DateTime Person_2_Wifi_LastSeen         "Person 2 Wifi last seen [%1$td.%1$tm.%1$tY %1$tH:%1$tM]" { channel="mqtt:topic:mosquitto:Person_2_Wifi_LastSeen" }
+Number   Person_2_Wifi_LastSeen_Seconds "Person 2 Wifi last seen [%d]" { channel="mqtt:topic:mosquitto:Person_2_Wifi_LastSeen_Seconds" }
+
+Switch   Person_1_Wifi_Event            "Person 1 Wifi Event [%s]" { channel="mqtt:topic:mosquitto:Person_1_Wifi_Event" }
+Switch   Person_2_Wifi_Event            "Person 2 Wifi Event [%s]" { channel="mqtt:topic:mosquitto:Person_2_Wifi_Event" }

@@ -1,0 +1,24 @@
+Bridge mqtt:broker:mosquitto "Mosquitto" [ host="192.168.1.1", port=1883, secure=false, retain=false, clientid="openHAB"]
+  //username="DVES_USER", 
+  //password="DVES_PASS",
+  //certificate="",
+  //certificatepin=false,
+  //publickey="",
+  //publickeypin=false,
+  //keep_alive_time=30000,
+  //reconnect_time=60000,
+  //lastwill_message="",
+  //lastwill_qos=1,
+  //lastwill_topic="",
+
+{
+    Thing topic Presence "Presence" @ "Home" {
+        Channels:
+            Type string : person_1_lastseen     [ stateTopic="owrtwifi/status/mac-xx-xx-xx-xx-xx-xx/lastseen/iso8601" ]
+            Type number : person_1_lastseen_s   [ stateTopic="owrtwifi/status/mac-xx-xx-xx-xx-xx-xx/lastseen/epoch" ]
+            Type switch : person_1_event        [ stateTopic="owrtwifi/status/mac-xx-xx-xx-xx-xx-xx/event" ]
+            Type string : person_2_lastseen     [ stateTopic="owrtwifi/status/mac-xx-xx-xx-xx-xx-xx/lastseen/iso8601" ]
+            Type number : person_2_lastseen_s   [ stateTopic="owrtwifi/status/mac-xx-xx-xx-xx-xx-xx/lastseen/epoch" ]
+            Type switch : person_2_event        [ stateTopic="owrtwifi/status/mac-xx-xx-xx-xx-xx-xx/event" ]
+    }
+}

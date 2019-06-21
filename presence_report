@@ -1,4 +1,9 @@
-#!/bin/sh
+#!/bin/ash
+
+# Allow further customization via ENV variables
+: ${MQTT_BASETOPIC:="owrtwifi"}
+: ${MQTT_STATUS_TOPIC:="${MQTT_BASETOPIC}/status/mac-"}
+: ${MQTT_MAINTENANCE_TOPIC:="${MQTT_BASETOPIC}/maintenance"}
 
 DEFAULT_MODE="event"
 DEFAULT_MQTT_SERVER="10.1.1.50"
@@ -8,9 +13,9 @@ MODE=$DEFAULT_MODE
 MQTT_SERVER=$DEFAULT_MQTT_SERVER
 LAST_SEEN_UPDATE_PERIOD_S=$DEFAULT_LAST_SEEN_UPDATE_PERIOD_S
 
-MQTT_ID_EVENT="OpenWRT-Presence-Event"
-MQTT_ID_LASTSEEN="OpenWRT-Presence-LastSeen"
-MQTT_TOPIC="owrtwifi/status/mac-"
+MQTT_ID="${MQTT_BASETOPIC}"
+MQTT_ID_EVENT="${MQTT_BASETOPIC}_event"
+MQTT_ID_LASTSEEN="${MQTT_BASETOPIC}_lastseen"
 
 SCRIPT_NAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 
@@ -18,7 +23,7 @@ SCRIPT_NAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 # Parse command line args
 test_for_mode(){
   param_mode=$1
-  if [ "$param_mode" == "event" -o "$param_mode" == "lastseen" ]; then
+  if [ "${param_mode}" == "event" -o "${param_mode}" == "lastseen" ]; then
     MODE=$param_mode
     return 0
   fi
@@ -48,15 +53,15 @@ test_for_update_periode_s(){
 print_usage(){
 cat << EOF
 Supported optional parameters:
-  mode: "event" or "lastseen" (default: $DEFAULT_MODE)
+  mode: "event" or "lastseen" (default: ${DEFAULT_MODE})
     In event mode changes of registered mac addresses are imediately pushed to the MQTT server
     In lastseen mode the registered mac addresses are periodically pushed to the MQTT server
-  MQTT server IP: the IPv4 address of the MQTT server (default $DEFAULT_MQTT_SERVER)
-  Udate periode [s]: only relevant for lastseen mode  (default $LAST_SEEN_UPDATE_PERIOD_S)
+  MQTT server IP: the IPv4 address of the MQTT server (default ${DEFAULT_MQTT_SERVER})
+  Udate periode [s]: only relevant for lastseen mode  (default ${LAST_SEEN_UPDATE_PERIOD_S})
 Examples:
-  $SCRIPT_NAME
-  $SCRIPT_NAME 192.168.1.2
-  $SCRIPT_NAME lastseen 300
+  ${SCRIPT_NAME}
+  ${SCRIPT_NAME} 192.168.1.2
+  ${SCRIPT_NAME} lastseen 300
 EOF
 }
 
@@ -68,34 +73,38 @@ for param in "$@"; do
 done
 
 
-if [ "$MODE" == "event" ]; then
-  echo "$SCRIPT_NAME, mode: $MODE, MQTT server: $MQTT_SERVER"
+if [ "${MODE}" == "event" ]; then
+  echo "${SCRIPT_NAME}, mode: ${MODE}, MQTT server: ${MQTT_SERVER}"
   iw event | \
   while read LINE; do
     if echo $LINE | grep -q -E "(new|del) station"; then
-      EVENT=`echo $LINE | awk '/(new|del) station/ {print $2}'`
-      MAC=`echo $LINE | awk '/(new|del) station/ {print $4}'`
+      EVENT=$(echo ${LINE} | awk '/(new|del) station/ {print $2}')
+      MAC=$(echo ${LINE} | awk '/(new|del) station/ {print $4}')
 
-      echo "Mac: $MAC did $EVENT"
-      mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_EVENT -t "$MQTT_TOPIC${MAC//:/-}/event" -m $EVENT
+      echo "Mac: ${MAC} did ${EVENT}"
+      mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_EVENT -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/event" -m $EVENT
     fi
   done
-elif [ "$MODE" == "lastseen" ]; then
-  echo "$SCRIPT_NAME, mode: $MODE, MQTT server: $MQTT_SERVER, period: $LAST_SEEN_UPDATE_PERIOD_S"
+elif [ "${MODE}" == "lastseen" ]; then
+  echo "${SCRIPT_NAME}, mode: ${MODE}, MQTT server: ${MQTT_SERVER}, period: ${LAST_SEEN_UPDATE_PERIOD_S}"
   while true
   do
+    # Publish own lastseen state
+    mosquitto_pub -h $MQTT_SERVER -i $MQTT_BASETOPIC -t "${MQTT_MAINTENANCE_TOPIC}/lastseen/epoch" -m "$(date +%s)" -r
+
+    # Publish lastseen state of wifi devices
     for interface in `iw dev | grep Interface | cut -f 2 -s -d" "`
     do
       # for each interface, get mac addresses of connected stations/clients
-      maclist=`iw dev $interface station dump | grep Station | cut -f 2 -s -d" "` 
+      maclist=$(iw dev $interface station dump | grep Station | cut -f 2 -s -d" ")
       for mac in $maclist
       do
         echo "lastseen epoch   ${mac//:/-} $(date +%s)"
-        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "$MQTT_TOPIC${mac//:/-}/lastseen/epoch" -m "$(date +%s)" -r
+        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/epoch" -m "$(date +%s)" -r
         echo "lastseen iso8601 ${mac//:/-} $(date +%Y-%m-%dT%H:%M:%S%z)"
-        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "$MQTT_TOPIC${mac//:/-}/lastseen/iso8601" -m "$(date +%Y-%m-%dT%H:%M:%S%z)" -r
+        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/iso8601" -m "$(date +%Y-%m-%dT%H:%M:%S%z)" -r
       done
     done
-    sleep ${LAST_SEEN_UPDATE_PERIOD_S}
+    sleep $LAST_SEEN_UPDATE_PERIOD_S
   done
 fi

@@ -21,10 +21,15 @@ Call `chmod u+x /usr/bin/presence_report` to allow script execution.
 
 Place the following lines
 
-- `nohup /usr/bin/presence_report event 192.168.1.2 >/dev/null 2>&1 &`
-- `nohup /usr/bin/presence_report lastseen 192.168.1.2 >/dev/null 2>&1 &`
+    nohup /usr/bin/presence_report event 192.168.1.2 >/dev/null 2>&1 &
+    nohup /usr/bin/presence_report lastseen 192.168.1.2 >/dev/null 2>&1 &
 
 inside the `/etc/rc.local` file before the `exit 0`. You can to this via command-line or via LuCI in System -> Startup -> Local Startup. The script will be executed after reboot.
+
+If you are running more than one OpenWRT Router and want to collect data from both, you can specify an own base topic for each with:
+
+    MQTT_BASETOPIC="owrtwifi2" nohup /usr/bin/presence_report event 192.168.1.2 >/dev/null 2>&1 &
+    MQTT_BASETOPIC="owrtwifi2" nohup /usr/bin/presence_report lastseen 192.168.1.2 >/dev/null 2>&1 &
 
 Usage
 -----

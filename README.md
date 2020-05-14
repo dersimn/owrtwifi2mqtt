@@ -12,7 +12,14 @@ Install the packages
 
 with either luci or opkg.
 
-### Copy over the script
+### Get the script
+
+#### Download
+
+    opkg update && opkg install libustream-openssl
+    wget -O /usr/bin/presence_report https://raw.githubusercontent.com/dersimn/owrtwifi2mqtt/master/presence_report && chmod u+x /usr/bin/presence_report
+
+#### Copy with SCP
 
 Use SCP to copy the presence_report script to `/usr/bin/presence_report` on the target device.
 Call `chmod u+x /usr/bin/presence_report` to allow script execution.
@@ -30,6 +37,14 @@ If you are running more than one OpenWRT Router and want to collect data from bo
 
     MQTT_BASETOPIC="owrtwifi2" nohup /usr/bin/presence_report event 192.168.1.2 >/dev/null 2>&1 &
     MQTT_BASETOPIC="owrtwifi2" nohup /usr/bin/presence_report lastseen 192.168.1.2 >/dev/null 2>&1 &
+
+ENV variables for configuration are:
+
+- `MQTT_BASETOPIC`: `owrtwifi`
+- `MQTT_STATUS_TOPIC`: `$MQTT_BASETOPIC/status/mac-`
+- `MQTT_MAINTENANCE_TOPIC`: `$MQTT_BASETOPIC/maintenance`
+- `MQTT_USER`
+- `MQTT_PASSWORD`
 
 Usage
 -----

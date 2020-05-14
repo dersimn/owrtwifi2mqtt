@@ -4,6 +4,8 @@
 : ${MQTT_BASETOPIC:="owrtwifi"}
 : ${MQTT_STATUS_TOPIC:="${MQTT_BASETOPIC}/status/mac-"}
 : ${MQTT_MAINTENANCE_TOPIC:="${MQTT_BASETOPIC}/maintenance"}
+: ${MQTT_USER:=""}
+: ${MQTT_PASSWORD:=""}
 
 DEFAULT_MODE="event"
 DEFAULT_MQTT_SERVER="10.1.1.50"
@@ -82,7 +84,7 @@ if [ "${MODE}" == "event" ]; then
       MAC=$(echo ${LINE} | awk '/(new|del) station/ {print $4}')
 
       echo "Mac: ${MAC} did ${EVENT}"
-      mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_EVENT -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/event" -m $EVENT
+      mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_ID_EVENT -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/event" -m $EVENT
     fi
   done
 elif [ "${MODE}" == "lastseen" ]; then
@@ -90,7 +92,7 @@ elif [ "${MODE}" == "lastseen" ]; then
   while true
   do
     # Publish own lastseen state
-    mosquitto_pub -h $MQTT_SERVER -i $MQTT_BASETOPIC -t "${MQTT_MAINTENANCE_TOPIC}/lastseen/epoch" -m "$(date +%s)" -r
+    mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_BASETOPIC -t "${MQTT_MAINTENANCE_TOPIC}/lastseen/epoch" -m "$(date +%s)" -r
 
     # Publish lastseen state of wifi devices
     for interface in `iw dev | grep Interface | cut -f 2 -s -d" "`
@@ -100,9 +102,9 @@ elif [ "${MODE}" == "lastseen" ]; then
       for mac in $maclist
       do
         echo "lastseen epoch   ${mac//:/-} $(date +%s)"
-        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/epoch" -m "$(date +%s)" -r
+        mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/epoch" -m "$(date +%s)" -r
         echo "lastseen iso8601 ${mac//:/-} $(date +%Y-%m-%dT%H:%M:%S%z)"
-        mosquitto_pub -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/iso8601" -m "$(date +%Y-%m-%dT%H:%M:%S%z)" -r
+        mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/iso8601" -m "$(date +%Y-%m-%dT%H:%M:%S%z)" -r
       done
     done
     sleep $LAST_SEEN_UPDATE_PERIOD_S

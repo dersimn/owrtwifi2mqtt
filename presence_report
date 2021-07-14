@@ -6,6 +6,7 @@
 : ${MQTT_MAINTENANCE_TOPIC:="${MQTT_BASETOPIC}/maintenance"}
 : ${MQTT_USER:=""}
 : ${MQTT_PASSWORD:=""}
+: ${MQTT_ID:="${MQTT_BASETOPIC}"}
 
 DEFAULT_MODE="event"
 DEFAULT_MQTT_SERVER="10.1.1.50"
@@ -15,15 +16,11 @@ MODE=$DEFAULT_MODE
 MQTT_SERVER=$DEFAULT_MQTT_SERVER
 LAST_SEEN_UPDATE_PERIOD_S=$DEFAULT_LAST_SEEN_UPDATE_PERIOD_S
 
-MQTT_ID="${MQTT_BASETOPIC}"
-MQTT_ID_EVENT="${MQTT_BASETOPIC}_event"
-MQTT_ID_LASTSEEN="${MQTT_BASETOPIC}_lastseen"
-
 SCRIPT_NAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 
 
 # Parse command line args
-test_for_mode(){
+test_for_mode() {
   param_mode=$1
   if [ "${param_mode}" == "event" -o "${param_mode}" == "lastseen" ]; then
     MODE=$param_mode
@@ -32,7 +29,7 @@ test_for_mode(){
   return 1
 }
 
-test_for_ipv4(){
+test_for_ipv4() {
   param_ip=$1
   echo $param_ip | grep -E '\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b' > /dev/null
   if [ $? -eq 0 ]; then
@@ -42,7 +39,7 @@ test_for_ipv4(){
   return 1
 }
 
-test_for_update_periode_s(){
+test_for_update_periode_s() {
   param_up=$1
   expr $param_up : '[0-9][0-9]*$'
   if [ $? -eq 0 ]; then
@@ -52,7 +49,7 @@ test_for_update_periode_s(){
   return 1
 }
 
-print_usage(){
+print_usage() {
 cat << EOF
 Supported optional parameters:
   mode: "event" or "lastseen" (default: ${DEFAULT_MODE})
@@ -84,29 +81,47 @@ if [ "${MODE}" == "event" ]; then
       MAC=$(echo ${LINE} | awk '/(new|del) station/ {print $4}')
 
       echo "Mac: ${MAC} did ${EVENT}"
-      mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_ID_EVENT -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/event" -m $EVENT
+      mosquitto_pub \
+        -h ${MQTT_SERVER} \
+        -u ${MQTT_USER} -P ${MQTT_PASSWORD} -i ${MQTT_ID} \
+        -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/event" \
+        -m $EVENT
     fi
   done
 elif [ "${MODE}" == "lastseen" ]; then
   echo "${SCRIPT_NAME}, mode: ${MODE}, MQTT server: ${MQTT_SERVER}, period: ${LAST_SEEN_UPDATE_PERIOD_S}"
-  while true
-  do
+  while true; do
     CURRENT_TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+    CURRENT_TIMESTAMP_EPOCH=$(date -d "${CURRENT_TIMESTAMP}" +%s)
+    CURRENT_TIMESTAMP_ISO8601=$(date -d "${CURRENT_TIMESTAMP}" -Iseconds)
 
     # Publish own lastseen state
-    mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_BASETOPIC -t "${MQTT_MAINTENANCE_TOPIC}/lastseen/epoch" -m "$(date -d "${CURRENT_TIMESTAMP}" +%s)" -r
+    mosquitto_pub \
+      -h ${MQTT_SERVER} \
+      -u ${MQTT_USER} -P ${MQTT_PASSWORD} -i ${MQTT_ID} \
+      -t "${MQTT_MAINTENANCE_TOPIC}/lastseen/epoch" \
+      -m ${CURRENT_TIMESTAMP_EPOCH} \
+      -r
 
     # Publish lastseen state of wifi devices
-    for interface in $(iw dev | grep Interface | cut -f 2 -s -d" ")
-    do
+    for INTERFACE in $(iw dev | grep Interface | cut -f 2 -s -d" "); do
       # for each interface, get mac addresses of connected stations/clients
-      maclist=$(iw dev $interface station dump | grep Station | cut -f 2 -s -d" ")
-      for mac in $maclist
-      do
-        echo "lastseen epoch   ${mac//:/-} $(date +%s)"
-        mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/epoch" -m "$(date -d "${CURRENT_TIMESTAMP}" +%s)" -r
-        echo "lastseen iso8601 ${mac//:/-} $(date +%Y-%m-%dT%H:%M:%S%z)"
-        mosquitto_pub -u $MQTT_USER -P $MQTT_PASSWORD -h $MQTT_SERVER -i $MQTT_ID_LASTSEEN -t "${MQTT_STATUS_TOPIC}${mac//:/-}/lastseen/iso8601" -m "$(date -d "${CURRENT_TIMESTAMP}" -Iseconds)" -r
+      MAC_LIST=$(iw dev ${INTERFACE} station dump | grep Station | cut -f 2 -s -d" ")
+      for MAC in ${MAC_LIST}; do
+        echo "lastseen epoch   ${MAC//:/-} ${CURRENT_TIMESTAMP_EPOCH}"
+        mosquitto_pub \
+          -h ${MQTT_SERVER} \
+          -u ${MQTT_USER} -P ${MQTT_PASSWORD} -i ${MQTT_ID} \
+          -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/lastseen/epoch" \
+          -m ${CURRENT_TIMESTAMP_EPOCH} \
+          -r
+        echo "lastseen iso8601 ${MAC//:/-} ${CURRENT_TIMESTAMP_ISO8601}"
+        mosquitto_pub \
+          -h ${MQTT_SERVER} \
+          -u ${MQTT_USER} -P ${MQTT_PASSWORD} -i ${MQTT_ID} \
+          -t "${MQTT_STATUS_TOPIC}${MAC//:/-}/lastseen/iso8601" \
+          -m ${CURRENT_TIMESTAMP_ISO8601} \
+          -r
       done
     done
     sleep $LAST_SEEN_UPDATE_PERIOD_S

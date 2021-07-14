@@ -45,6 +45,7 @@ ENV variables for configuration are:
 - `MQTT_MAINTENANCE_TOPIC`: `$MQTT_BASETOPIC/maintenance`
 - `MQTT_USER`
 - `MQTT_PASSWORD`
+- `MQTT_ID`: `$MQTT_BASETOPIC`
 
 Usage
 -----

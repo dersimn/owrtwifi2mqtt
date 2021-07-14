@@ -63,6 +63,10 @@ Unix epoch in seconds
 
 Message will be `new` or `del` and is sent right after the device connected/disconnected to/from WiFi.
 
+Additionally the DHCP name (if available) from `/tmp/dhcp.leases` will be published to
+
+    owrtwifi/status/mac-00-00-00-00-00-00/dhcp-name
+
 
 Credits
 -------
